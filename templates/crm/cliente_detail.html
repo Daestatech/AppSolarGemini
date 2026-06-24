@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <a href="{% url 'crm:cliente_list' %}" class="text-xs font-bold text-gray-400 uppercase tracking-wider hover:text-gray-600">
+                ⬅️ Voltar para a Lista
+            </a>
+            <h2 class="text-3xl font-extrabold text-gray-950 mt-1">👤 {{ cliente.nome }}</h2>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{% url 'crm:cliente_update' cliente.pk %}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-xl text-xs transition-colors border border-gray-200 shadow-sm">
+                ✏️ Editar Dados / Fase
+            </a>
+            <span class="px-3 py-1.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 uppercase">
+                {{ cliente.get_fase_atual_display }}
+            </span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="md:col-span-2 space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="text-sm font-bold text-gray-400 uppercase mb-4 tracking-wider">Dados Cadastrais</h3>
+                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <dt class="text-gray-400 font-medium">CPF/CNPJ</dt>
+                        <dd class="text-gray-900 font-semibold mt-0.5">{{ cliente.cpf_cnpj }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-gray-400 font-medium">Telefone</dt>
+                        <dd class="text-gray-900 font-semibold mt-0.5">{{ cliente.telefone }}</dd>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <dt class="text-gray-400 font-medium">E-mail</dt>
+                        <dd class="text-gray-900 font-semibold mt-0.5">{{ cliente.email|default:"Não informado" }}</dd>
+                    </div>
+                </dl>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="text-sm font-bold text-gray-400 uppercase mb-4 tracking-wider">Endereço de Instalação</h3>
+                <p class="text-sm text-gray-900 font-semibold">
+                    {{ cliente.endereco }}, Nº {{ cliente.numero }}<br>
+                    {{ cliente.bairro }} — {{ cliente.cidade }}/{{ cliente.estado }}<br>
+                    <span class="text-xs text-gray-400 font-normal">CEP: {{ cliente.cep }}</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="md:col-span-1">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between h-full space-y-6">
+                <div>
+                    <h3 class="text-sm font-bold text-gray-400 uppercase mb-4 tracking-wider">📁 Arquivos e Evidências</h3>
+                    
+                    <div class="space-y-3 mb-6">
+                        {% for anexo in anexos %}
+                        <div class="p-3 bg-gray-50 rounded-xl border border-gray-100 flex flex-col justify-between gap-2">
+                            <div class="flex items-start gap-2 overflow-hidden">
+                                <span class="text-lg">📄</span>
+                                <span class="text-xs text-gray-700 font-medium truncate" title="{{ anexo.titulo }}">{{ anexo.titulo }}</span>
+                            </div>
+                            <a href="{{ anexo.arquivo.url }}" download class="w-full text-center bg-gray-900 hover:bg-gray-800 text-white text-xs font-bold py-2 px-3 rounded-lg transition-colors shadow-sm">
+                                ⬇️ Baixar Arquivo
+                            </a>
+                        </div>
+                        {% empty %}
+                        <p class="text-xs text-gray-400 italic text-center py-6">
+                            Nenhum documento foi anexado para este cliente ainda.
+                        </p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-100 pt-4">
+                    <h4 class="text-xs font-bold text-gray-700 uppercase mb-2">➕ Adicionar Documentos</h4>
+                    <form action="{% url 'crm:adicionar_anexo' cliente.pk %}" method="POST" enctype="multipart/form-data" class="space-y-2">
+                        {% csrf_token %}
+                        <input type="file" name="arquivos_anexos" multiple required class="w-full text-xs text-gray-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 rounded-lg transition-colors shadow-sm">
+                            Upload de Arquivos
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-6">
+    <div class="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+        <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+            ☀️ Simulador Solar União Marken
+        </h2>
+        <p class="text-sm text-gray-500 mb-6">Insira os dados da conta de energia para calcular a usina ideal.</p>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <form id="solar-form" method="POST" class="space-y-5">
+                {% csrf_token %}
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Consumo Mensal Médio (kWh)</label>
+                    <input type="number" id="input-consumo" name="consumo_mensal_kwh" required min="1" placeholder="Ex: 500"
+                           class="w-full p-4 rounded-xl border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500 text-lg font-bold text-gray-900 bg-gray-50">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Irradiação Solar Local (kWh/m²/dia)</label>
+                    <input type="number" id="input-irradiacao" name="irradiacao_local" required step="0.01" value="5.0" placeholder="Ex: 5.15"
+                           class="w-full p-4 rounded-xl border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500 text-lg text-gray-900 bg-gray-50">
+                    <span class="text-xs text-gray-400">Média da região (Cresesb)</span>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Potência do Módulo (Wp)</label>
+                    <select id="select-potencia" name="potencia_painel_wp" class="w-full p-4 rounded-xl border-gray-300 bg-gray-50 text-gray-900 font-medium">
+                        <option value="450">450 Wp</option>
+                        <option value="550" selected>550 Wp (Padrão)</option>
+                        <option value="600">600 Wp</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 active:scale-[0.99] text-white font-bold p-4 rounded-xl transition-all shadow-lg text-lg mt-4">
+                    💾 Salvar Dimensionamento
+                </button>
+            </form>
+
+            <div class="bg-gradient-to-br from-gray-900 to-slate-800 rounded-2xl p-6 text-white flex flex-col justify-between shadow-inner">
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-yellow-400 mb-6">⚡ Resumo da Usina Proposta</h3>
+                    
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="border-b border-gray-700 pb-4">
+                            <p class="text-xs text-gray-400">Potência do Sistema</p>
+                            <p class="text-2xl font-black text-white mt-1"><span id="res-potencia">0.0</span> <span class="text-sm text-yellow-400">kWp</span></p>
+                        </div>
+                        <div class="border-b border-gray-700 pb-4">
+                            <p class="text-xs text-gray-400">Qtd. de Painéis</p>
+                            <p class="text-2xl font-black text-white mt-1"><span id="res-placas">0</span> <span class="text-sm text-yellow-400">módulos</span></p>
+                        </div>
+                        <div class="pb-4 sm:pb-0">
+                            <p class="text-xs text-gray-400">Área Estimada</p>
+                            <p class="text-xl font-bold text-white mt-1"><span id="res-area">0.0</span> <span class="text-xs text-gray-400">m²</span></p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400">Peso sobre Telhado</p>
+                            <p class="text-xl font-bold text-white mt-1"><span id="res-peso">0.0</span> <span class="text-xs text-gray-400">kg</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 border-t border-gray-700 pt-4 text-center text-xs text-gray-400">
+                    *Cálculos baseados em perdas padrão de 20% (taxa de desempenho de 0.80).
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const consumoIn = document.getElementById('input-consumo');
+    const irradiacaoIn = document.getElementById('input-irradiacao');
+    const potenciaSel = document.getElementById('select-potencia');
+
+    function reciclarSimulacao() {
+        const consumo = parseFloat(consumoIn.value) || 0;
+        const irradiacao = parseFloat(irradiacaoIn.value) || 0;
+        const potenciaPainel = parseInt(potenciaSel.value);
+
+        if (consumo > 0 && irradiacao > 0) {
+            // Regra matemática igual ao Backend
+            const potenciaSistemaKwp = consumo / (30 * irradiacao * 0.80);
+            const qtdPlacas = Math.ceil((potenciaSistemaKwp * 1000) / potenciaPainel);
+            const potenciaFinalKwp = (qtdPlacas * potenciaPainel) / 1000;
+            const area = qtdPlacas * 2.2;
+            const peso = qtdPlacas * 30;
+
+            // Atualiza os elementos na tela
+            document.getElementById('res-potencia').innerText = potenciaFinalKwp.toFixed(2);
+            document.getElementById('res-placas').innerText = qtdPlacas;
+            document.getElementById('res-area').innerText = area.toFixed(1);
+            document.getElementById('res-peso').innerText = peso.toFixed(0);
+        } else {
+            document.getElementById('res-potencia').innerText = "0.0";
+            document.getElementById('res-placas').innerText = "0";
+            document.getElementById('res-area').innerText = "0.0";
+            document.getElementById('res-peso').innerText = "0.0";
+        }
+    }
+
+    // Escuta qualquer mudança nos campos para atualizar na hora
+    consumoIn.addEventListener('input', reciclarSimulacao);
+    irradiacaoIn.addEventListener('input', reciclarSimulacao);
+    potenciaSel.addEventListener('change', reciclarSimulacao);
+</script>
+{% endblock %}

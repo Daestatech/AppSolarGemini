@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-6">
+    <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+            ⚡ Novo Cliente Solar
+        </h2>
+
+        {% if form.errors %}
+        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-xl mb-6">
+            <h3 class="text-sm font-bold text-red-800">O formulário não pôde ser salvo:</h3>
+            <ul class="mt-2 list-disc list-inside text-xs text-red-700 space-y-1">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data" class="space-y-5">
+            {% csrf_token %}
+
+            <div class="border-b border-gray-100 pb-4">
+                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Dados do Cliente</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo / Razão Social</label>
+                        <input type="text" name="nome" required value="{{ form.nome.value|default:'' }}" class="w-full p-3.5 rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">CPF ou CNPJ</label>
+                        <input type="text" name="cpf_cnpj" required value="{{ form.cpf_cnpj.value|default:'' }}" class="w-full p-3.5 rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-gray-50">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Telefone / WhatsApp</label>
+                        <input type="text" name="telefone" required value="{{ form.telefone.value|default:'' }}" class="w-full p-3.5 rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-gray-50" placeholder="(00) 00000-0000">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">E-mail (Opcional)</label>
+                        <input type="email" name="email" value="{{ form.email.value|default:'' }}" class="w-full p-3.5 rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-gray-50">
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-b border-gray-100 pb-4">
+                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Endereço da Instalação</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="md:col-span-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">CEP</label>
+                        <input type="text" name="cep" required value="{{ form.cep.value|default:'' }}" class="w-full p-3.5 rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-gray-50">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Logradouro (Rua/Av)</label>
+                        <input type="text" name="endereco" required value="{{ form.endereco.value|default:'' }}" class="w-full p-3.5 rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-gray-50">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Número</label>
+                        <input type="text" name="numero" required value="{{ form.numero.value|default:'' }}" class="w-full p-3.5 rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
+                        <input type="text" name="bairro" required value="{{ form.bairro.value|default:'' }}" class="w-full p-3.5 rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Cidade</label>
+                        <input type="text" name="cidade" required value="{{ form.cidade.value|default:'' }}" class="w-full p-3.5 rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-gray-50">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Estado (UF)</label>
+                        <input type="text" name="estado" required value="{{ form.estado.value|default:'' }}" class="w-full p-3.5 rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-gray-50" placeholder="Ex: SP" maxlength="2">
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-b border-gray-100 pb-4">
+                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Especificações Técnicas</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Estrutura</label>
+                        {{ form.tipo_estrutura }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fase Inicial</label>
+                        {{ form.fase_atual }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-b border-gray-100 pb-4">
+                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Especificações Técnicas</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Estrutura</label>
+                        {{ form.tipo_estrutura }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fase Inicial</label>
+                        {{ form.fase_atual }}
+                    </div>
+                </div>
+                
+                {% if request.user.role == 'ADMIN' %}
+                <div class="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-200">
+                    <h4 class="text-xs font-bold text-amber-800 uppercase tracking-wider mb-2">🛡️ Controle Gerencial (Exclusivo Admin)</h4>
+                    <div>
+                        <label class="block text-sm font-medium text-amber-900 mb-1">Transferir Carteira / Vincular Consultor</label>
+                        {{ form.vendedor }}
+                        <p class="text-[11px] text-amber-700 mt-1">Selecione qual consultor será o dono e responsável por este cliente solar.</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
+                <h3 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2">📸 Documentos e Evidências</h3>
+                <p class="text-xs text-blue-600 mb-3">Você pode selecionar múltiplos arquivos (Contas de energia, fotos do padrão de entrada, CNH, etc.). No celular, você pode tirar a foto direto pela câmera.</p>
+                
+                <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-blue-300 border-dashed rounded-lg cursor-pointer bg-white hover:bg-blue-50 transition-colors">
+                    <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-2">
+                        <span class="text-2xl mb-1">📎</span>
+                        <p class="text-sm text-gray-600 font-medium">Toque para tirar foto ou anexar arquivos</p>
+                        <p class="text-xs text-gray-400">PDF, PNG, JPG (Múltiplos permitidos)</p>
+                    </div>
+                    <input type="file" name="arquivos_anexos" id="arquivos_anexos" multiple accept="image/*,application/pdf" class="hidden">
+                </label>
+                <div id="file-list" class="mt-3 text-xs text-gray-600 space-y-1"></div>
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold p-4 rounded-xl transition-colors shadow-md text-center active:scale-[0.98]">
+                    Salvar e Avançar
+                </button>
+                <a href="{% url 'crm:cliente_list' %}" class="w-1/3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium p-4 rounded-xl text-center transition-colors">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Script simples para listar os arquivos selecionados antes do envio
+    document.getElementById('arquivos_anexos').addEventListener('change', function(e) {
+        const fileList = document.getElementById('file-list');
+        fileList.innerHTML = '<strong>Arquivos selecionados:</strong>';
+        for (let i = 0; i < this.files.length; i++) {
+            fileList.innerHTML += `<div>📄 ${this.files[i].name}</div>`;
+        }
+    });
+</script>
+{% endblock %}

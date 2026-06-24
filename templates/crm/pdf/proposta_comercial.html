@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        @page {
+            size: a4;
+            margin: 2cm;
+            @bottom-right {
+                content: "Pág " counter(page) " de " counter(pages);
+                font-size: 9pt;
+                color: #718096;
+            }
+        }
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+        .header { text-align: center; border-bottom: 2px solid #ecc94b; padding-bottom: 20px; }
+        .title { color: #1a202c; font-size: 24pt; font-weight: bold; margin-top: 10px; }
+        .section-title { color: #2b6cb0; font-size: 14pt; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; margin-top: 30px; }
+        .grid-dados { margin-top: 15px; }
+        .label { font-semibold: bold; color: #4a5568; }
+        .highlight-box { background-color: #f7fafc; border-left: 4px solid #ecc94b; padding: 15px; margin-top: 15px; }
+        .price { font-size: 18pt; color: #2f855a; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div style="font-size: 14pt; font-weight: bold; color: #ecc94b;">REDE UNIÃO MARKEN</div>
+        <div class="title">Proposta Técnica Comercial</div>
+        <div>Usinas Solares Fotovoltaicas</div>
+    </div>
+
+    <div class="section-title">1. Dados do Cliente</div>
+    <table class="grid-dados" width="100%">
+        <tr>
+            <td width="50%"><span class="label">Cliente:</span> {{ cliente.nome }}</td>
+            <td width="50%"><span class="label">CPF/CNPJ:</span> {{ cliente.cpf_cnpj }}</td>
+        </tr>
+        <tr>
+            <td><span class="label">Cidade/UF:</span> {{ cliente.cidade }} - {{ cliente.estado }}</td>
+            <td><span class="label">Consultor Responsável:</span> {{ vendedor.get_full_name }}</td>
+        </tr>
+    </table>
+
+    <div class="section-title">2. Dimensionamento da Engenharia</div>
+    <p>Com base no consumo informado de <strong>{{ dimensionamento.consumo_mensal_kwh }} kWh</strong>, projetámos o seguinte sistema ideal:</p>
+    <table width="100%" style="margin-top: 10px; border-collapse: collapse;">
+        <tr style="background-color: #edf2f7;">
+            <th style="padding: 8px; text-align: left;">Especificação</th>
+            <th style="padding: 8px; text-align: right;">Quantidade / Valor</th>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #e2e8f0;">Potência Total da Usina</td>
+            <td style="padding: 8px; border-bottom: 1px solid #e2e8f0; text-align: right;"><strong>{{ dimensionamento.potencia_sistema_kwp }} kWp</strong></td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #e2e8f0;">Módulos Fotovoltaicos (Placas)</td>
+            <td style="padding: 8px; border-bottom: 1px solid #e2e8f0; text-align: right;">{{ dimensionamento.qtd_placas }} unidades de {{ dimensionamento.potencia_painel_wp }}Wp</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #e2e8f0;">Área Mínima Necessária no Telhado</td>
+            <td style="padding: 8px; border-bottom: 1px solid #e2e8f0; text-align: right;">{{ dimensionamento.area_necessaria_m2 }} m²</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #e2e8f0;">Tipo de Estrutura Solicitada</td>
+            <td style="padding: 8px; border-bottom: 1px solid #e2e8f0; text-align: right;">{{ cliente.get_tipo_estrutura_display }}</td>
+        </tr>
+    </table>
+
+    <div class="section-title">3. Investimento e Condições</div>
+    <div class="highlight-box">
+        <p>Para o fornecimento completo de equipamentos, engenharia, instalação e homologação junto à concessionária de energia:</p>
+        <p class="price">Valor Total: R$ {{ proposta.valor_total_investimento }}</p>
+        <p style="font-size: 10pt; margin-top: 10px; color: #718096;">
+            * Prazo de execução total: {{ proposta.prazo_entrega_dias }} dias.<br>
+            * Proposta válida por {{ proposta.validade_proposta_dias }} dias a contar da data de emissão.
+        </p>
+    </div>
+
+</body>
+</html>

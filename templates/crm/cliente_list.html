@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900">📊 Funil de Clientes Solares</h2>
+            <p class="text-sm text-gray-500">Acompanhamento de leads e dimensionamentos da Rede União Marken</p>
+        </div>
+        <a href="{% url 'crm:cliente_create' %}" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-md text-sm">
+            ➕ Novo Cliente
+        </a>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-50 border-b border-gray-100 text-gray-600 text-xs font-semibold uppercase">
+                    <th class="p-4">Nome do Cliente</th>
+                    <th class="p-4">Cidade/UF</th>
+                    <th class="p-4">Fase Atual</th>
+                    <th class="p-4">Vendedor</th>
+                    <th class="p-4">Ações</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50 text-sm text-gray-700">
+                {% for cliente in clientes %}
+                <tr class="hover:bg-gray-50/50 transition-colors">
+                    <td class="p-4 font-medium text-gray-950">
+                        <a href="{% url 'crm:cliente_detail' cliente.pk %}" class="text-blue-600 hover:text-blue-800" hover:underline transition-colors>">
+                            {{ cliente.nome }}
+                        </a>
+                    </td>
+                    <td class="p-4">{{ cliente.cidade }}/{{ cliente.uf }}</td>
+                    <td class="p-4">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700">
+                            {{ cliente.get_fase_atual_display }}
+                        </span>
+                    </td>
+                    <td class="p-4 text-xs text-gray-500">{{ cliente.vendedor.username }}</td>
+                    <td class="p-4">
+                        <span class="text-gray-400 text-xs">Aguardando Proposta</span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="p-8 text-center text-gray-400 italic">
+                        Nenhum cliente cadastrado por enquanto.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
