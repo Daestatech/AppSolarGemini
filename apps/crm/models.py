@@ -123,11 +123,15 @@ class Contrato(models.Model):
         return f"Contrato {self.numero_contrato} - {self.proposta.cliente.nome}"
 
     def save(self, *args, **kwargs):
+        """
+        Gatilho do Backend (Hook): Ao salvar um contrato, altera automaticamente 
+        a fase do cliente para 'CONTRATO' (Contrato Assinado).
+        """
         is_new = self.pk is None
         super().save(*args, **kwargs)
         
         if is_new:
-            # Captura o cliente através do relacionamento e avança a fase dele
+            # Captura o cliente através do relacionamento
             cliente = self.proposta.cliente
             cliente.fase_atual = FaseProcesso.CONTRATO
             cliente.save()
