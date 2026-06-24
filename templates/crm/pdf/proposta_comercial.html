@@ -1,84 +1,132 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <style>
         @page {
-            size: a4;
-            margin: 2cm;
-            @bottom-right {
-                content: "Pág " counter(page) " de " counter(pages);
-                font-size: 9pt;
-                color: #718096;
-            }
+            size: A4;
+            margin: 20mm 15mm 20mm 15mm;
         }
         body {
-            font-family: 'Helvetica', 'Arial', sans-serif;
-            color: #2d3748;
-            line-height: 1.6;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #333333;
+            line-height: 1.5;
+            font-size: 11pt;
         }
-        .header { text-align: center; border-bottom: 2px solid #ecc94b; padding-bottom: 20px; }
-        .title { color: #1a202c; font-size: 24pt; font-weight: bold; margin-top: 10px; }
-        .section-title { color: #2b6cb0; font-size: 14pt; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; margin-top: 30px; }
-        .grid-dados { margin-top: 15px; }
-        .label { font-semibold: bold; color: #4a5568; }
-        .highlight-box { background-color: #f7fafc; border-left: 4px solid #ecc94b; padding: 15px; margin-top: 15px; }
-        .price { font-size: 18pt; color: #2f855a; font-weight: bold; }
+        .header {
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        .title {
+            color: #1e3a8a;
+            font-size: 24pt;
+            font-weight: bold;
+            margin: 0;
+        }
+        .subtitle {
+            color: #4b5563;
+            font-size: 12pt;
+            margin-top: 5px;
+        }
+        .section-title {
+            background-color: #f3f4f6;
+            color: #1e3a8a;
+            padding: 6px 10px;
+            font-size: 13pt;
+            font-weight: bold;
+            margin-top: 25px;
+            border-left: 4px solid #2563eb;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        table th {
+            background-color: #1e3a8a;
+            color: white;
+            text-align: left;
+            padding: 8px;
+            font-size: 10pt;
+        }
+        table td {
+            padding: 8px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .highlight-box {
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .price {
+            font-size: 20pt;
+            color: #16a34a;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div style="font-size: 14pt; font-weight: bold; color: #ecc94b;">REDE UNIÃO MARKEN</div>
-        <div class="title">Proposta Técnica Comercial</div>
-        <div>Usinas Solares Fotovoltaicas</div>
+        <div class="title">⚡ PROPOSTA COMERCIAL</div>
+        <div class="subtitle">Sistema de Geração de Energia Fotovoltaica</div>
     </div>
 
-    <div class="section-title">1. Dados do Cliente</div>
-    <table class="grid-dados" width="100%">
+    <p style="text-align: right; font-size: 10pt; color: #6b7280;">Data de Emissão: {{ data_emissao|date:"d/m/Y" }}</p>
+
+    <div class="section-title">1. DADOS DO CLIENTE</div>
+    <table>
         <tr>
-            <td width="50%"><span class="label">Cliente:</span> {{ cliente.nome }}</td>
-            <td width="50%"><span class="label">CPF/CNPJ:</span> {{ cliente.cpf_cnpj }}</td>
+            <td style="width: 25%; font-weight: bold;">Nome/Razão Social:</td>
+            <td>{{ cliente.nome }}</td>
         </tr>
         <tr>
-            <td><span class="label">Cidade/UF:</span> {{ cliente.cidade }} - {{ cliente.estado }}</td>
-            <td><span class="label">Consultor Responsável:</span> {{ vendedor.get_full_name }}</td>
+            <td style="font-weight: bold;">CPF/CNPJ:</td>
+            <td>{{ cliente.cpf_cnpj }}</td>
+        </tr>
+        <tr>
+            <td style="font-weight: bold;">Endereço de Instalação:</td>
+            <td>{{ cliente.endereco }}, Nº {{ cliente.numero }} - {{ cliente.bairro }}, {{ cliente.cidade }}/{{ cliente.estado }}</td>
         </tr>
     </table>
 
-    <div class="section-title">2. Dimensionamento da Engenharia</div>
-    <p>Com base no consumo informado de <strong>{{ dimensionamento.consumo_mensal_kwh }} kWh</strong>, projetámos o seguinte sistema ideal:</p>
-    <table width="100%" style="margin-top: 10px; border-collapse: collapse;">
-        <tr style="background-color: #edf2f7;">
-            <th style="padding: 8px; text-align: left;">Especificação</th>
-            <th style="padding: 8px; text-align: right;">Quantidade / Valor</th>
-        </tr>
-        <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #e2e8f0;">Potência Total da Usina</td>
-            <td style="padding: 8px; border-bottom: 1px solid #e2e8f0; text-align: right;"><strong>{{ dimensionamento.potencia_sistema_kwp }} kWp</strong></td>
-        </tr>
-        <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #e2e8f0;">Módulos Fotovoltaicos (Placas)</td>
-            <td style="padding: 8px; border-bottom: 1px solid #e2e8f0; text-align: right;">{{ dimensionamento.qtd_placas }} unidades de {{ dimensionamento.potencia_painel_wp }}Wp</td>
-        </tr>
-        <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #e2e8f0;">Área Mínima Necessária no Telhado</td>
-            <td style="padding: 8px; border-bottom: 1px solid #e2e8f0; text-align: right;">{{ dimensionamento.area_necessaria_m2 }} m²</td>
-        </tr>
-        <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #e2e8f0;">Tipo de Estrutura Solicitada</td>
-            <td style="padding: 8px; border-bottom: 1px solid #e2e8f0; text-align: right;">{{ cliente.get_tipo_estrutura_display }}</td>
-        </tr>
+    <div class="section-title">2. ENGENHARIA DO SISTEMA DIMENSIONADO</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Descrição do Parâmetro</th>
+                <th>Valor Apurado</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Consumo Médio Informado</td>
+                <td><strong>{{ proposta.consumo_kwh }} kWh/mês</strong></td>
+            </tr>
+            <tr>
+                <td>Potência Estimada da Usina Solar</td>
+                <td><strong>{{ proposta.potencia_usina }} kWp</strong></td>
+            </tr>
+            <tr>
+                <td>Quantidade de Módulos (Placas)</td>
+                <td><strong>{{ proposta.qtd_modulos }} unidades</strong> (Painéis de {{ proposta.potencia_painel }}W)</td>
+            </tr>
+            <tr>
+                <td>Tipo de Estrutura do Telhado</td>
+                <td>{{ cliente.get_tipo_estrutura_display }}</td>
+            </tr>
+        </tbody>
     </table>
 
-    <div class="section-title">3. Investimento e Condições</div>
+    <div class="section-title">3. INVESTIMENTO E CONDIÇÕES</div>
     <div class="highlight-box">
-        <p>Para o fornecimento completo de equipamentos, engenharia, instalação e homologação junto à concessionária de energia:</p>
-        <p class="price">Valor Total: R$ {{ proposta.valor_total_investimento }}</p>
-        <p style="font-size: 10pt; margin-top: 10px; color: #718096;">
-            * Prazo de execução total: {{ proposta.prazo_entrega_dias }} dias.<br>
-            * Proposta válida por {{ proposta.validade_proposta_dias }} dias a contar da data de emissão.
-        </p>
+        <p style="margin: 0; color: #4b5563; font-size: 11pt;">Valor Total do Projeto (Equipamentos + Engenharia + Instalação)</p>
+        <div class="price">R$ {{ proposta.valor_investimento|floatformat:2 }}</div>
+        <p style="margin-top: 5px; font-size: 9pt; color: #6b7280;">*Proposta sujeita a análise de viabilidade técnica no local.</p>
     </div>
 
 </body>

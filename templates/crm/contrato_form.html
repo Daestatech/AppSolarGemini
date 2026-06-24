@@ -1,39 +1,34 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="max-w-xl mx-auto px-4 py-8">
-    <div class="bg-white rounded-2xl shadow-xl p-6 border-2 border-green-100">
-        <div class="text-center mb-6">
-            <span class="text-4xl">✍️</span>
-            <h2 class="text-2xl font-bold text-gray-800 mt-2">Fechar Contrato Solar</h2>
-            <p class="text-sm text-gray-500">Insira os dados de fechamento para oficializar a usina no sistema.</p>
-        </div>
+<div class="max-w-md mx-auto px-4 py-6">
+    <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+        <h2 class="text-xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+            📝 Formalização de Contrato
+        </h2>
+        <p class="text-xs text-gray-400 mb-6">Insira os dados do contrato assinado para atualizar o status do projeto no funil.</p>
 
-        <form method="POST" enctype="multipart/form-data" class="space-y-5">
+        <form method="POST" enctype="multipart/form-data" class="space-y-4">
             {% csrf_token %}
-
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Número do Contrato / Identificador</label>
-                <input type="text" name="numero_contrato" required placeholder="Ex: CTR-2026-9482"
-                       class="w-full p-3.5 rounded-xl border-gray-300 shadow-sm focus:ring-green-500 focus:border-green-500 text-gray-900 bg-gray-50">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Número do Contrato</label>
+                {{ form.numero_contrato }}
+                <p class="text-[10px] text-gray-400 mt-1">Ex: CTR-2026-001</p>
             </div>
-
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Data de Assinatura</label>
-                <input type="date" name="data_assinatura" required value="{{ today|date:'Y-m-d' }}"
-                       class="w-full p-3.5 rounded-xl border-gray-300 shadow-sm focus:ring-green-500 focus:border-green-500 text-gray-900 bg-gray-50">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Data de Assinatura</label>
+                {{ form.data_assinatura }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Anexar Contrato Assinado (PDF)</label>
+                {{ form.arquivo_contrato_pdf }}
             </div>
 
-            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Anexar Contrato Assinado (Opcional)</label>
-                <p class="text-xs text-gray-400 mb-2">Caso já tenha o PDF digitalizado ou foto das assinaturas.</p>
-                <input type="file" name="arquivo_contrato_pdf" accept="application/pdf,image/*"
-                       class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
+            <div class="flex gap-3 pt-4">
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold p-3 rounded-xl transition-colors text-sm shadow-md">
+                    💾 Confirmar e Assinar Contrato
+                </button>
             </div>
-
-            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 active:scale-[0.99] text-white font-bold p-4 rounded-xl transition-all shadow-lg text-lg flex justify-center items-center gap-2">
-                🚀 Confirmar Venda e Ativar Projeto
-            </button>
         </form>
     </div>
 </div>

@@ -1,13 +1,14 @@
 from django.views.generic import ListView, DetailView, UpdateView, CreateView
 from apps.crm.models import Cliente, Proposta, Contrato, ClienteAnexo
-from apps.crm.forms import ClienteForm
+from apps.crm.forms import ClienteForm, PropostaForm, ContratoForm
 from apps.users.mixins import SolarAccessControlMixin
 from apps.users.models import CustomUser
 from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.http import HttpResponse
-from django.template.loader import get_template
+from django.template.loader import get_template, render_to_string
+from weasyprint import HTML
 from xhtml2pdf import pisa
 from django.contrib import messages
 from django.urls import reverse_lazy
@@ -88,6 +89,8 @@ class AdicionarAnexoView(SolarAccessControlMixin, View):
         # Redireciona de volta para a página de detalhes do próprio cliente
         return redirect('crm:cliente_detail', pk=pk)
 
+# apps/crm/views.py
+
 class ClienteUpdateView(SolarAccessControlMixin, UpdateView):
     model = Cliente
     form_class = ClienteForm
@@ -95,10 +98,17 @@ class ClienteUpdateView(SolarAccessControlMixin, UpdateView):
     success_url = reverse_lazy('crm:cliente_list')
 
     def form_valid(self, form):
-        # Na edição, se for um vendedor mexendo, garantimos que ele não altere o dono original
-        if self.request.user.role != 'ADMIN':
+        # 1. Se quem está editando for o ADMINISTRADOR:
+        if self.request.user.role == 'ADMIN':
+            # Pegamos o vendedor selecionado no dropdown do formulário
+            novo_vendedor = form.cleaned_data.get('vendedor')
+            if novo_vendedor:
+                form.instance.vendedor = novo_vendedor
+        else:
+            # 2. Se for um vendedor comum editando, blindamos para ele NÃO alterar o dono original
             form.instance.vendedor = self.get_object().vendedor
-            
+
+        # Executa o salvamento real no banco
         return super().form_valid(form)
 
 class TransferirClienteView(UserPassesTestMixin, View):
@@ -170,3 +180,79 @@ class RegistrarContratoView(SolarAccessControlMixin, CreateView):
 
     def get_success_url(self):
         return redirect('crm:cliente_list')
+    
+class PropostaCreateView(SolarAccessControlMixin, CreateView):
+    model = Proposta
+    form_class = PropostaForm
+    template_name = 'crm/proposta_form.html'
+
+    def form_valid(self, form):
+        # Vincula a proposta ao cliente passado na URL de forma dinâmica
+        cliente_pk = self.kwargs.get('pk')
+        form.instance.cliente = get_object_or_404(Cliente, pk=cliente_pk)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        # Após calcular, redireciona de volta para a ficha do cliente
+        return reverse_lazy('crm:cliente_detail', kwargs={'pk': self.kwargs.get('pk')})
+    
+class ContratoCreateView(SolarAccessControlMixin, CreateView):
+    model = Contrato
+    form_class = ContratoForm
+    template_name = 'crm/contrato_form.html'
+
+    def form_valid(self, form):
+        # Vincula o contrato à proposta vinda da URL
+        proposta_pk = self.kwargs.get('proposta_pk')
+        form.instance.proposta = get_object_or_404(Proposta, pk=proposta_pk)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        # Após salvar, busca o cliente para voltar à ficha dele
+        proposta = get_object_or_404(Proposta, pk=self.kwargs.get('proposta_pk'))
+        return reverse_lazy('crm:cliente_detail', kwargs={'pk': proposta.cliente.pk})
+    
+def proposta_pdf_view(request, proposta_pk):
+    """Gera o PDF da Proposta Comercial Solar"""
+    proposta = get_object_or_404(Proposta, pk=proposta_pk)
+    cliente = proposta.cliente
+    
+    context = {
+        'proposta': proposta,
+        'cliente': cliente,
+        'data_emissao': proposta.data_criacao,
+    }
+    
+    # Renderiza o HTML específico do documento em uma String
+    html_string = render_to_string('crm/pdf/proposta_comercial.html', context)
+    
+    # Converte a String HTML em PDF usando WeasyPrint
+    html = HTML(string=html_string, base_url=request.build_absolute_uri())
+    pdf_file = html.write_pdf()
+    
+    # Configura a resposta HTTP para abrir o PDF no navegador
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="Proposta_Solar_{cliente.nome.replace(" ", "_")}.pdf"'
+    return response
+
+
+def contrato_pdf_view(request, contrato_pk):
+    """Gera o PDF do Contrato de Prestação de Serviços"""
+    contrato = get_object_or_404(Contrato, pk=contrato_pk)
+    proposta = contrato.proposta
+    cliente = proposta.cliente
+    
+    context = {
+        'contrato': contrato,
+        'proposta': proposta,
+        'cliente': cliente,
+    }
+    
+    html_string = render_to_string('crm/pdf/contrato_servico.html', context)
+    
+    html = HTML(string=html_string, base_url=request.build_absolute_uri())
+    pdf_file = html.write_pdf()
+    
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="Contrato_Solar_{cliente.nome.replace(" ", "_")}.pdf"'
+    return response

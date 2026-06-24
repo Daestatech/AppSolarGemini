@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 25mm 20mm 25mm 20mm;
+        }
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            color: #111111;
+            line-height: 1.6;
+            font-size: 12pt;
+            text-align: justify;
+        }
+        .title {
+            text-align: center;
+            font-size: 16pt;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+        .clausula {
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 5px;
+        }
+        .assinaturas {
+            margin-top: 60px;
+            width: 100%;
+        }
+        .linha-assinatura {
+            border-top: 1px solid #000000;
+            text-align: center;
+            padding-top: 5px;
+            width: 40%;
+            font-size: 10pt;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="title">CONTRATO DE PRESTAÇÃO DE SERVIÇOS DE ENGENHARIA E INSTALAÇÃO SOLAR</div>
+    <div class="title" style="font-size: 12pt; margin-top: -20px;">Nº {{ contrato.numero_contrato }}</div>
+
+    <p>Pelo presente instrumento particular de contrato, de um lado a empresa contratada <strong>SOLAR GEMINI CRM S.A.</strong>, e de outro lado o <strong>CONTRATANTE</strong> qualificado abaixo:</p>
+    
+    <p><strong>NOME:</strong> {{ cliente.nome }}<br>
+    <strong>CPF/CNPJ:</strong> {{ cliente.cpf_cnpj }}<br>
+    <strong>ENDEREÇO:</strong> {{ cliente.endereco }}, Nº {{ cliente.numero }} - {{ cliente.bairro }}, {{ cliente.cidade }}/{{ cliente.estado }}</p>
+
+    <p>Resolvem firmar o presente contrato sob as cláusulas e condições seguintes:</p>
+
+    <div class="clausula">CLÁUSULA PRIMEIRA - DO OBJETO</div>
+    <p>O objeto deste contrato é a prestação de serviços de engenharia, fornecimento e instalação de um sistema gerador fotovoltaico com potência nominal de <strong>{{ proposta.potencia_usina }} kWp</strong>, composto por <strong>{{ proposta.qtd_modulos }}</strong> painéis solares.</p>
+
+    <div class="clausula">CLÁUSULA SEGUNDA - DO PREÇO E DO PAGAMENTO</div>
+    <p>Pela execução dos serviços e fornecimento dos materiais descritos no objeto, o CONTRATANTE pagará à CONTRATADA o valor total de <strong>R$ {{ proposta.valor_investimento|floatformat:2 }}</strong>, conforme condições comerciais previamente acordadas.</p>
+
+    <div class="clausula">CLÁUSULA TERCEIRA - DO PRAZO</div>
+    <p>O prazo estimado para a homologação junto à concessionária de energia e instalação completa do sistema é de até 60 (sessenta) dias a contar da data de assinatura deste instrumento.</p>
+
+    <p style="margin-top: 40px;">Por estarem justos e contratados, assinam o presente instrumento na data de seu registro técnico.</p>
+    
+    <p style="text-align: right; margin-top: 20px;">Data de Assinatura: {{ contrato.data_assinatura|date:"d/m/Y" }}</p>
+
+    <table class="assinaturas">
+        <tr>
+            <td class="linha-assinatura">SOLAR GEMINI CRM S.A.<br>Contratada</td>
+            <td style="width: 20%;"></td>
+            <td class="linha-assinatura">{{ cliente.nome }}<br>Contratante</td>
+        </tr>
+    </table>
+
+</body>
+</html>
