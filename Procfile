@@ -1,0 +1,1 @@
+web: gunicorn solar_crm.wsgi:application

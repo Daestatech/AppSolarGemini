@@ -30,9 +30,9 @@ sys.path.insert(0, APPS_DIR)
 SECRET_KEY = 'django-insecure-e(8@&kzee1ioznq+tri+m7f6&ql_y=63lrvxeq%755iv09o=kl'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.render.com', '.pythonanywhere.com', '.railway.app']
 
 
 # Application definition
