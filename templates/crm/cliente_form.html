@@ -86,13 +86,60 @@
             
             <div class="border-b border-gray-100 pb-4">
                 <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Especificações Técnicas</h3>
+                <div class="border-t border-gray-100 pt-6 mt-6">
+                    <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        ☀️ Dados para Dimensionamento Solar
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                                Consumo Atual do Cliente (kWh)
+                            </label>
+                            {{ form.consumo_kwh }}
+                            {% if form.consumo_kwh.errors %}
+                                <p class="text-red-500 text-xs mt-1">{{ form.consumo_kwh.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                                Produção Estimada Desejada (kWh)
+                            </label>
+                            {{ form.producao_estimada_kwh }}
+                            {% if form.producao_estimada_kwh.errors %}
+                                <p class="text-red-500 text-xs mt-1">{{ form.producao_estimada_kwh.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                                Potência das Placas/Painéis (Watts)
+                            </label>
+                            {{ form.potencia_painel }}
+                            {% if form.potencia_painel.errors %}
+                                <p class="text-red-500 text-xs mt-1">{{ form.potencia_painel.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                                Marca do Inversor
+                            </label>
+                            {{ form.marca_inversor }}
+                            {% if form.marca_inversor.errors %}
+                                <p class="text-red-500 text-xs mt-1">{{ form.marca_inversor.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Estrutura</label>
                         {{ form.tipo_estrutura }}
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Fase Inicial</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Fase Inicial</label>
                         {{ form.fase_atual }}
                     </div>
                 </div>

@@ -16,7 +16,7 @@ class FaseProcesso(models.TextChoices):
     PROJETO_CONCLUIDO = 'CONCLUIDO', 'Projeto Concluído'
 
 class Cliente(models.Model):
-    # Relacionamento com o Vendedor (Se deletar o vendedor, o cliente fica sem vendedor, mas NÃO é excluído)
+    # Relacionamento com o Vendedor
     vendedor = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name='clientes')
 
     # Dados Pessoais
@@ -33,17 +33,49 @@ class Cliente(models.Model):
     cidade = models.CharField(max_length=100)
     estado = models.CharField(max_length=2)
     
-    # Dados Técnicos de Negócio
-    tipo_estrutura = models.CharField(max_length=20, choices=TipoEstrutura.choices)
+    # Configurações de Negócio Existentes
+    tipo_estrutura = models.CharField(max_length=50, choices=TipoEstrutura.choices, default=TipoEstrutura.CERAMICA)
     fase_atual = models.CharField(max_length=20, choices=FaseProcesso.choices, default=FaseProcesso.LEAD)
-    
-    # Histórico e Soft Delete
-    is_active = models.BooleanField(default=True) # Permite inativar sem excluir os dados e estatísticas
     criado_em = models.DateTimeField(auto_now_add=True)
-    atualizado_em = models.DateTimeField(auto_now=True)
+
+    # ⚡ NOVOS CAMPOS ADICIONADOS (2ª Melhoria):
+    consumo_kwh = models.PositiveIntegerField(default=0, help_text="Consumo atual do cliente (ex: 1000 kWh)")
+    producao_estimada_kwh = models.PositiveIntegerField(default=0, help_text="Produção estimada que o cliente quer para a usina (ex: 1500 kWh)")
+    potencia_painel = models.PositiveIntegerField(default=550, help_text="Potência dos painéis/placas em Watts (ex: 550)")
+    marca_inversor = models.CharField(max_length=100, blank=True, null=True, help_text="Marca do inversor que será usado")
     
+    # Campos que o sistema calculará automaticamente com base nos dados acima:
+    potencia_usina = models.DecimalField(max_digits=6, decimal_places=2, default=0.00, help_text="Calculado: Potência total da usina em kWp")
+    qtd_modulos = models.PositiveIntegerField(default=0, help_text="Calculado: Quantidade de placas")
+    valor_investimento = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="Calculado: Preço final do projeto")
+
     def __str__(self):
-        return self.nome
+        return f"{self.nome} — {self.get_fase_atual_display()}"
+
+    def save(self, *args, **kwargs):
+        """
+        Gatilho do Backend (Hook): Calcula automaticamente o dimensionamento 
+        técnico e o preço estimado antes de salvar no banco de dados.
+        """
+        # 1. Regra de Cálculo Solar Técnico Integrado
+        if self.producao_estimada_kwh > 0 and self.potencia_painel > 0:
+            # Estimativa padrão: Irradiação média de 4.5 e perdas de 20% (fator 3.6)
+            # Potência Usina (kWp) = Produção Desejada / (30 dias * 4.5 h * 0.8)
+            self.potencia_usina = round(float(self.producao_estimada_kwh) / (30 * 4.5 * 0.8), 2)
+            
+            # Quantidade de módulos = (Potência Usina em Watts) / Potência de 1 Painel
+            potencia_usina_watts = self.potencia_usina * 1000
+            import math
+            self.qtd_modulos = math.ceil(potencia_usina_watts / self.potencia_painel)
+            
+            # Preço Médio de Mercado (Exemplo: R$ 3.200,00 por kWp instalado)
+            self.valor_investimento = round(self.potencia_usina * 3200, 2)
+        else:
+            self.potencia_usina = 0.00
+            self.qtd_modulos = 0
+            self.valor_investimento = 0.00
+
+        super().save(*args, **kwargs)
     
 class ClienteAnexo(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='anexos')
