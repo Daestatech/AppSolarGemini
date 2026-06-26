@@ -3,16 +3,20 @@ from apps.users.models import CustomUser
 from django.utils import timezone
 
 class TipoEstrutura(models.TextChoices):
-    ZINCO = 'ZINCO', 'Zinco / Metálica'
-    FIBROCIMENTO = 'FIBROCIMENTO', 'Fibrocimento'
-    SOLO = 'SOLO', 'Solo'
-    CERAMICA = 'CERAMICA', 'Cerâmica'
+    # ⚡ Alterado de Telhado Cerâmico para Telhado Colonial
+    COLONIAL = 'COLONIAL', 'Telhado Colonial'  
+    METALICO = 'METALICO', 'Telhado Metálico'
     LAJE = 'LAJE', 'Laje'
+    SOLO = 'SOLO', 'Solo'
+    # ⚡ Adicionado Fibrocimento com (Telhão)
+    FIBROCIMENTO = 'FIBROCIMENTO', 'Telhado Fibrocimento(Telhão)'
 
 class FaseProcesso(models.TextChoices):
-    LEAD = 'LEAD', 'Lead'
+    # ⚡ Alterado de LEAD para ORÇAMENTO
+    ORCAMENTO = 'ORCAMENTO', 'Orçamento'  
     PROPOSTA = 'PROPOSTA', 'Proposta Apresentada'
     CONTRATO = 'CONTRATO', 'Contrato Assinado'
+    # Mantenha as outras fases que você já tiver abaixo...
     PROJETO_CONCLUIDO = 'CONCLUIDO', 'Projeto Concluído'
 
 class Cliente(models.Model):
@@ -34,8 +38,8 @@ class Cliente(models.Model):
     estado = models.CharField(max_length=2)
     
     # Configurações de Negócio Existentes
-    tipo_estrutura = models.CharField(max_length=50, choices=TipoEstrutura.choices, default=TipoEstrutura.CERAMICA)
-    fase_atual = models.CharField(max_length=20, choices=FaseProcesso.choices, default=FaseProcesso.LEAD)
+    tipo_estrutura = models.CharField(max_length=50, choices=TipoEstrutura.choices, default=TipoEstrutura.COLONIAL)
+    fase_atual = models.CharField(max_length=20, choices=FaseProcesso.choices, default=FaseProcesso.ORCAMENTO)
     criado_em = models.DateTimeField(auto_now_add=True)
 
     # ⚡ NOVOS CAMPOS ADICIONADOS (2ª Melhoria):

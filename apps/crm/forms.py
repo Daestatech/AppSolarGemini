@@ -66,10 +66,11 @@ class ContratoForm(forms.ModelForm):
 class SimuladorLivreForm(forms.Form):
     tipo_estrutura = forms.ChoiceField(
         choices=[
-            ('CERAMICA', 'Telhado Cerâmico'),
+            ('COLONIAL', 'Telhado Colonial'), # ⚡ Atualizado
             ('METALICO', 'Telhado Metálico'),
             ('LAJE', 'Laje'),
             ('SOLO', 'Solo'),
+            ('FIBROCIMENTO', 'Telhado Fibrocimento(Telhão)'), # ⚡ Adicionado
         ],
         label="Tipo de Estrutura",
         widget=forms.Select(attrs={'class': 'w-full p-3.5 rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white'})
