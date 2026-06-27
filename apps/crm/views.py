@@ -52,10 +52,9 @@ class ClienteListView(SolarAccessControlMixin, ListView):
     context_object_name = 'clientes'
 
     def get_queryset(self):
-        # Pega a consulta padrão (todos os clientes)
-        queryset = super().get_queryset()
+        # ⚡ FILTRO DO SOFT DELETE ativo aqui:
+        queryset = super().get_queryset().filter(is_active=True)
         
-        # Se o usuário logado NÃO for administrador (for um vendedor), filtra pela carteira dele
         if self.request.user.role != 'ADMIN':
             queryset = queryset.filter(vendedor=self.request.user)
             
@@ -285,8 +284,9 @@ class SimuladorLivreView(SolarAccessControlMixin, View):
             tipo_estrutura = form.get_choice_display('tipo_estrutura') if hasattr(form, 'get_choice_display') else form.cleaned_data['tipo_estrutura']
 
             # Executa a mesma lógica de Engenharia Solar do modelo
+            HSP_PADRAO = 3.9
             if producao > 0 and potencia_painel > 0:
-                potencia_usina = round(float(producao) / (30 * 4.5 * 0.8), 2)
+                potencia_usina = round(float(producao) / (30 * HSP_PADRAO * 0.8), 2)
                 potencia_usina_watts = potencia_usina * 1000
                 qtd_modulos = math.ceil(potencia_usina_watts / potencia_painel)
                 valor_investimento = round(potencia_usina * 3200, 2)
@@ -307,3 +307,13 @@ class SimuladorLivreView(SolarAccessControlMixin, View):
             }
 
         return render(request, self.template_name, context)
+    
+class ClienteSoftDeleteView(SolarAccessControlMixin, View):
+    """View para desativar o cliente do painel sem apagar do banco de dados"""
+    def post(self, request, pk):
+        cliente = get_object_or_404(Cliente, pk=pk)
+        cliente.is_active = False
+        cliente.save()
+        
+        messages.success(request, f"👤 O cliente {cliente.nome} foi arquivado/desativado com sucesso.")
+        return redirect('crm:cliente_list')

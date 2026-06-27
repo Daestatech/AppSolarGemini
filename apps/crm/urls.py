@@ -1,12 +1,12 @@
 # apps/crm/urls.py
 from django.urls import path
 
-from apps.users import views
 from .views import (
     ClienteCreateView,
     ClienteListView,
     ClienteDetailView,
     AdicionarAnexoView,
+    ClienteSoftDeleteView,
     ClienteUpdateView,
     PropostaCreateView,
     ContratoCreateView,
@@ -28,4 +28,5 @@ urlpatterns = [
     path('proposta/<int:proposta_pk>/pdf/', proposta_pdf_view, name='proposta_pdf'),
     path('contrato/<int:contrato_pk>/pdf/', contrato_pdf_view, name='contrato_pdf'),
     path('simulador-livre/', SimuladorLivreView.as_view(), name='simulador_livre'),
+    path('cliente/<int:pk>/desativar/', ClienteSoftDeleteView.as_view(), name='cliente_desativar'),
 ]
