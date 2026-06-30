@@ -58,21 +58,18 @@ class Cliente(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        Gatilho do Backend (Hook): Calcula automaticamente o dimensionamento 
-        técnico e o preço estimado antes de salvar no banco de dados.
+        Gatilho do Backend: Calcula o dimensionamento considerando a regra de mercado (1 kWp = 117 kWh)
         """
-        # 1. Regra de Cálculo Solar Técnico Integrado
         if self.producao_estimada_kwh > 0 and self.potencia_painel > 0:
-            # Estimativa padrão: Irradiação média de 4.5 e perdas de 20% (fator 3.6)
-            # Potência Usina (kWp) = Produção Desejada / (30 dias * 4.5 h * 0.8)
-            self.potencia_usina = round(float(self.producao_estimada_kwh) / (30 * 4.5 * 0.8), 2)
+            # ☀️ NOVA MATEMÁTICA: kWp = Produção Desejada / 117
+            self.potencia_usina = round(float(self.producao_estimada_kwh) / 117.0, 2)
             
-            # Quantidade de módulos = (Potência Usina em Watts) / Potência de 1 Painel
+            # Quantidade de módulos = (Potência Usina em Watts) / Potência de 1 Painel (ex: 625W)
             potencia_usina_watts = self.potencia_usina * 1000
             import math
             self.qtd_modulos = math.ceil(potencia_usina_watts / self.potencia_painel)
             
-            # Preço Médio de Mercado (Exemplo: R$ 3.200,00 por kWp instalado)
+            # Preço final baseado no novo kWp (Exemplo: R$ 3.200,00 por kWp instalado)
             self.valor_investimento = round(self.potencia_usina * 3200, 2)
         else:
             self.potencia_usina = 0.00
@@ -80,35 +77,11 @@ class Cliente(models.Model):
             self.valor_investimento = 0.00
 
         super().save(*args, **kwargs)
+
     is_active = models.BooleanField(
         default=True, 
         help_text="Define se o cliente está ativo no sistema (Soft Delete)"
     )
-
-    def save(self, *args, **kwargs):
-        """
-        Gatilho do Backend: Calcula o dimensionamento considerando o HSP padrão fixado em 3.9
-        """
-        # ☀️ VALOR FIXADO CONFORME DECISÃO ESTRATÉGICA
-        HSP_PADRAO = 3.9
-        
-        if self.producao_estimada_kwh > 0 and self.potencia_painel > 0:
-            # Potência Usina (kWp) = Produção Desejada / (30 dias * 3.9 HSP * 0.8 de eficiência)
-            self.potencia_usina = round(float(self.producao_estimada_kwh) / (30 * HSP_PADRAO * 0.8), 2)
-            
-            # Quantidade de módulos = (Potência Usina em Watts) / Potência de 1 Painel
-            potencia_usina_watts = self.potencia_usina * 1000
-            import math
-            self.qtd_modulos = math.ceil(potencia_usina_watts / self.potencia_painel)
-            
-            # Preço final baseado no kWp (ex: R$ 3.200,00 por kWp instalado)
-            self.valor_investimento = round(self.potencia_usina * 3200, 2)
-        else:
-            self.potencia_usina = 0.00
-            self.qtd_modulos = 0
-            self.valor_investimento = 0.00
-
-        super().save(*args, **kwargs)
         
 class ClienteAnexo(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='anexos')

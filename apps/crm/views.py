@@ -286,7 +286,7 @@ class SimuladorLivreView(SolarAccessControlMixin, View):
             # Executa a mesma lógica de Engenharia Solar do modelo
             HSP_PADRAO = 3.9
             if producao > 0 and potencia_painel > 0:
-                potencia_usina = round(float(producao) / (30 * HSP_PADRAO * 0.8), 2)
+                potencia_usina = round(float(producao) / 117.0, 2)
                 potencia_usina_watts = potencia_usina * 1000
                 qtd_modulos = math.ceil(potencia_usina_watts / potencia_painel)
                 valor_investimento = round(potencia_usina * 3200, 2)
