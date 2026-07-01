@@ -317,3 +317,32 @@ class ClienteSoftDeleteView(SolarAccessControlMixin, View):
         
         messages.success(request, f"👤 O cliente {cliente.nome} foi arquivado/desativado com sucesso.")
         return redirect('crm:cliente_list')
+
+# apps/crm/views.py
+
+class ClienteInativoListView(SolarAccessControlMixin, ListView):
+    """Exibe a lista de clientes que foram desativados/arquivados"""
+    model = Cliente
+    template_name = 'crm/cliente_inativo_list.html'
+    context_object_name = 'clientes'
+
+    def get_queryset(self):
+        # Traz apenas os registros INATIVOS
+        queryset = super().get_queryset().filter(is_active=False)
+        
+        # Mantém a trava de vendedor se não for ADMIN
+        if self.request.user.role != 'ADMIN':
+            queryset = queryset.filter(vendedor=self.request.user)
+            
+        return queryset
+
+
+class ClienteReativarView(SolarAccessControlMixin, View):
+    """View para restaurar o cliente para a listagem ativa"""
+    def post(self, request, pk):
+        cliente = get_object_or_404(Cliente, pk=pk)
+        cliente.is_active = True
+        cliente.save()
+        
+        messages.success(request, f"🎉 O cliente {cliente.nome} foi reativado e retornou para a dashboard!")
+        return redirect('crm:cliente_list')
